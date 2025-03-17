@@ -1,63 +1,118 @@
-# Gerenciamento de Laboratório - PowerShell
+# Gerenciamento de Laboratório
 
-Este projeto permite ligar e desligar remotamente as máquinas de um laboratório Windows via rede, utilizando **Wake-on-LAN (WoL)** e **PowerShell Remoting**.
+Este projeto permite o gerenciamento remoto de máquinas em um laboratório com Windows, utilizando scripts PowerShell para ligar, desligar e verificar o status das máquinas.
 
-## 📁 Estrutura do Projeto
+## 📂 Estrutura do Projeto
+
 ```
-📂 Gerenciamento-Laboratorio
-│── 📂 scripts
-│   │── ligar-laboratorio.ps1        # Script para ligar todas as máquinas do laboratório
-│   │── desligar-laboratorio.ps1     # Script para desligar todas as máquinas do laboratório
-│── 📂 config
-│   │── maquinas-exemplo.json        # Exemplo de configuração com os MACs das máquinas
-│── run-ligar.bat                    # Atalho para executar o script de ligar as máquinas
-│── run-desligar.bat                  # Atalho para executar o script de desligar as máquinas
-│── .gitignore                        # Arquivo para evitar upload de dados sensíveis
-│── README.md                         # Documentação do projeto
+📦 Gerenciamento-Laboratorio
+├📂 config
+│ └📄 maquinas-exemplo.json
+├📂 scripts
+│ ├📄 desligar-laboratorio.ps1
+│ ├📄 executar-comando.ps1
+│ ├📄 gerar-log.ps1
+│ ├📄 ligar-laboratorio.ps1
+│ ├📄 reiniciar-laboratorio.ps1
+│ ├📄 verificar-status.ps1
+├📄 .gitignore
+├📄 LICENSE
+├📄 README.md
+├📄 run-desligar.bat
+├📄 run-executar.bat
+├📄 run-ligar.bat
+├📄 run-reiniciar.bat
+└📄 run-verificar.bat
 ```
 
-## 🔧 Configuração Inicial
+## 🛠️ Funcionalidades
 
-1. **Copie o arquivo de exemplo:**
-   ```sh
-   cp config/maquinas-exemplo.json config/maquinas.json
-   ```
-2. **Edite `config/maquinas.json` e adicione as máquinas com seus MACs reais.**
-3. **Garanta que o Wake-on-LAN esteja ativado na BIOS e no Windows.**
+- ✅ **Ligar todas as máquinas do laboratório** via Wake-on-LAN.
+- ✅ **Desligar todas as máquinas** remotamente via PowerShell.
+- ✅ **Verificar o status das máquinas** (ligadas/desligadas).
+- ✅ **Registrar logs de eventos**, como ligações e desligamentos.
+
+## 📝 Logs de Atividades
+
+Os logs são armazenados em `logs/laboratorio-log.txt`. Se o diretório `logs/` não existir, ele será criado automaticamente ao executar os scripts.
+
+### 💜 Exemplo de log:
+```
+2024-03-17 10:00:00 - Ligar laboratório iniciado.
+2024-03-17 18:00:00 - Desligar laboratório concluído.
+```
+
+## 🛠️ Scripts PowerShell
+
+### 🔹 `gerar-log.ps1` (Registrar logs)
+```powershell
+# Definir caminho do log
+$logDir = "../logs"
+$logPath = "$logDir/laboratorio-log.txt"
+
+# Criar diretório de logs se não existir
+if (!(Test-Path $logDir)) {
+    New-Item -ItemType Directory -Path $logDir | Out-Null
+}
+
+# Função para registrar logs
+function Write-Log {
+    param (
+        [string]$mensagem
+    )
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    "$timestamp - $mensagem" | Out-File -Append -FilePath $logPath
+}
+
+# Exemplo de uso
+Write-Log "Ligar laboratório iniciado."
+```
+
+### 🔹 `ligar-laboratorio.ps1` (Ligar máquinas via Wake-on-LAN)
+```powershell
+. ./gerar-log.ps1  # Importa a função Write-Log
+Write-Log "Enviando pacotes Wake-on-LAN..."
+```
+
+### 🔹 `desligar-laboratorio.ps1` (Desligar máquinas remotamente)
+```powershell
+. ./gerar-log.ps1
+Write-Log "Desligando todas as máquinas..."
+```
+
+### 🔹 `verificar-status.ps1` (Verificar status das máquinas)
+```powershell
+. ./gerar-log.ps1
+Write-Log "Verificando status das máquinas..."
+```
+
+---
 
 ## 🚀 Como Usar
 
-### ✅ Ligar todas as máquinas
-1. Execute `run-ligar.bat` (duplo clique) **ou**:
+1. Clone este repositório:
    ```sh
-   powershell -ExecutionPolicy Bypass -File scripts/ligar-laboratorio.ps1
+   git clone https://github.com/LuiSilvak/Gerenciamento-Laboratorio.git
+   ```
+2. Para executar os scripts PowerShell, abra um terminal como **Administrador** e use:
+   ```sh
+   cd Gerenciamento-Laboratorio/scripts
+   powershell -ExecutionPolicy Bypass -File ligar-laboratorio.ps1
+   ```
+3. Alternativamente, você pode executar os arquivos `.bat` na raiz do projeto:
+   ```sh
+   run-ligar.bat     # Liga todas as máquinas
+   run-desligar.bat  # Desliga todas as máquinas
+   run-verificar.bat # Verifica o status das máquinas
    ```
 
-### ❌ Desligar todas as máquinas
-1. Execute `run-desligar.bat` (duplo clique) **ou**:
-   ```sh
-   powershell -ExecutionPolicy Bypass -File scripts/desligar-laboratorio.ps1
-   ```
+## 📃 Tabela de Arquivos `.bat`
 
-## 📌 Dependências
-- **PowerShell 5.1 ou superior**
-- **Acesso de administrador** na máquina que executará os comandos
-- **Configuração do PowerShell Remoting** para permitir desligamento remoto (`Enable-PSRemoting`)
+| Arquivo `.bat`        | Descrição |
+|-----------------------|-----------|
+| `run-ligar.bat`       | Liga todas as máquinas |
+| `run-desligar.bat`    | Desliga todas as máquinas |
+| `run-reiniciar.bat`   | Reinicia todas as máquinas |
+| `run-verificar.bat`   | Verifica o status das máquinas |
 
-## 🛠️ Personalização
-Se desejar adicionar mais máquinas, basta editar o arquivo `config/maquinas.json` e incluir os novos dispositivos no formato:
-```json
-{
-  "maquinas": [
-    { "nome": "PC1", "mac": "00:00:00:00:00:00" },
-    { "nome": "PC2", "mac": "11:11:11:11:11:11" }
-  ]
-}
-```
 
-## 🔒 Segurança
-Para evitar expor informações sensíveis:
-- **Os arquivos `.json` reais são ignorados pelo `.gitignore`**, impedindo que os MACs sejam enviados ao repositório público.
-- **Os arquivos `.bat` não armazenam dados sensíveis**, apenas servem como atalhos.
-
----
