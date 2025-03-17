@@ -61,4 +61,3 @@ Para evitar expor informações sensíveis:
 - **Os arquivos `.bat` não armazenam dados sensíveis**, apenas servem como atalhos.
 
 ---
-💡 **Agora seu laboratório pode ser gerenciado remotamente de forma simples e eficiente!** 🚀
