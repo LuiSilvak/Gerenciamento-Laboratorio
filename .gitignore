@@ -1,0 +1,6 @@
+# Ignorar arquivos sensíveis
+config/maquinas.json
+
+# Ignorar arquivos de execução local
+### run-ligar.bat (Ativar assim que estiver na máquina principal)
+### run-desligar.bat (Ativar assim que estiver na máquina principal)
